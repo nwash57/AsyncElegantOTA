@@ -52,8 +52,13 @@ void AsyncElegantOtaClass::begin(AsyncWebServer *server, const char* username, c
         // the request handler is triggered after the upload has finished... 
         // create the response, add header, and send response
         AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
-        response->addHeader("Connection", "close");
-        response->addHeader("Access-Control-Allow-Origin", "*");
+        
+        /* Do not add headers to the requests, this prevents consumers from using their own default headers.
+         * Also, should a library really be adding a wildcard allow-origin header without at least giving 
+         * consumers a heads up..? */
+        // response->addHeader("Connection", "close");
+        // response->addHeader("Access-Control-Allow-Origin", "*");
+        
         request->send(response);
         restart();
     }, [&](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
